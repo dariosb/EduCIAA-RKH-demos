@@ -34,6 +34,8 @@
 
 # Executables
 *.exe
+*.bin
+*.elf
 *.out
 *.app
 *.i*86
@@ -53,4 +55,5 @@
 modules.order
 Module.symvers
 Mkfile.old
-dkms.conf
+*.lst
+*.map
