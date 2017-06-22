@@ -31,7 +31,7 @@
 
 /**
  *  \file       bsp.c
- * 	\brief 		BSP for Cortex-M3 EDU-CIAA LPC4337 ARM-GCC
+ *  \brief      BSP for Cortex-M3 EDU-CIAA LPC4337 ARM-GCC
  *
  *  \ingroup    bsp
  */
@@ -58,14 +58,21 @@ RKH_THIS_MODULE
 
 /* ----------------------------- Local macros ------------------------------ */
 #ifdef DEBUG
-#define reset_now()		    __asm volatile ("bkpt 0x00FF\n")
-#else					
-#define reset_now()		    NVIC_SystemReset()
+#define reset_now()         __asm volatile ("bkpt 0x00FF\n")
+#else
+#define reset_now()         NVIC_SystemReset()
 #endif
 
 /* ------------------------------- Constants ------------------------------- */
-#define TRC_COM_PORT		UART_USB	
-#define BSP_TS_RATE_HZ      10
+#define TRC_COM_PORT        UART_USB
+#define TRC_BAUD_RATE       115200
+#define BSP_TICK_RATE_MS    (1000/RKH_CFG_FWK_TICK_RATE_HZ)
+#define BSP_TS_RATE_HZ      BSP_TICK_RATE_MS
+
+/* ---------------------------- Local data types --------------------------- */
+/* ---------------------------- Global variables --------------------------- */
+/* ---------------------------- Local variables ---------------------------- */
+static RKH_TS_T tstamp;
 
 /* ----------------------- Local function prototypes ----------------------- */
 static bool_t tickHook(void *p);
@@ -74,131 +81,133 @@ static bool_t tickHook(void *p);
 static bool_t
 tickHook(void *p)
 {
+    ++tstamp;
     RKH_TIM_TICK();
 }
 
 /* ---------------------------- Global functions --------------------------- */
-void 
-rkh_hook_timetick(void) 
+void
+rkh_hook_timetick(void)
 {
 }
 
-void 
-rkh_hook_start(void) 
+void
+rkh_hook_start(void)
 {
 }
 
-void 
-rkh_hook_exit(void) 
+void
+rkh_hook_exit(void)
 {
-	RKH_TRC_FLUSH();
+    RKH_TRC_FLUSH();
 }
 
-void 
+void
 rkh_hook_idle(void)
 {
-	RKH_ENA_INTERRUPT();
-	RKH_TRC_FLUSH();
+    RKH_ENA_INTERRUPT();
+    RKH_TRC_FLUSH();
 }
 
-void 
+void
 rkh_assert(RKHROM char * const file, int line)
 {
-	(void)line;
+    (void)line;
 
-	RKH_DIS_INTERRUPT();
-	RKH_TR_FWK_ASSERT( (RKHROM char *)file, __LINE__ );
-	rkh_fwk_exit();
-	reset_now();
+    RKH_DIS_INTERRUPT();
+    RKH_TR_FWK_ASSERT((RKHROM char *)file, __LINE__);
+    rkh_fwk_exit();
+    reset_now();
 }
 
 #if RKH_CFG_TRC_EN == 1
-void 
+void
 rkh_trc_open(void)
 {
-	rkh_trc_init();
-    uartConfig(TRC_COM_PORT, 115200);
-	RKH_TRC_SEND_CFG(BSP_TS_RATE_HZ );
+    rkh_trc_init();
+    uartConfig(TRC_COM_PORT, TRC_BAUD_RATE);
+    RKH_TRC_SEND_CFG(BSP_TS_RATE_HZ);
 }
 
-void 
+void
 rkh_trc_close(void)
 {
 }
 
-RKH_TS_T 
+RKH_TS_T
 rkh_trc_getts(void)
 {
-//	return ( RKH_TS_T )get_ts();
-    return 0;
+    return tstamp;
 }
 
-void 
+void
 rkh_trc_flush(void)
 {
-	rui8_t *blk;
-	TRCQTY_T nbytes;
-	RKH_SR_ALLOC();
+    rui8_t *blk;
+    TRCQTY_T nbytes;
+    RKH_SR_ALLOC();
 
-	FOREVER
-	{
-		nbytes = 128;
+    FOREVER
+    {
+        nbytes = 128;
 
-		RKH_ENTER_CRITICAL_();
-		blk = rkh_trc_get_block(&nbytes);
-		RKH_EXIT_CRITICAL_();
+        RKH_ENTER_CRITICAL_();
+        blk = rkh_trc_get_block(&nbytes);
+        RKH_EXIT_CRITICAL_();
 
-		if((blk != (rui8_t *)0))
-		{
-            while(nbytes--)
+        if ((blk != (rui8_t *)0))
+        {
+            while (nbytes--)
             {
                 uartWriteByte(TRC_COM_PORT,*blk++);
             }
-		}
-		else
-			break;
-	}	
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 #endif
 
-void 
+void
 bsp_init(int argc, char *argv[])
 {
-	(void)argc;
-	(void)argv;
-	
+    (void)argc;
+    (void)argv;
+
     boardConfig();
 
-    tickConfig(1000/RKH_CFG_FWK_TICK_RATE_HZ, tickHook);
-    
+    tickConfig(BSP_TICK_RATE_MS, tickHook);
+
     gpioConfig(0, GPIO_ENABLE);
 
     gpioConfig(LED1, GPIO_OUTPUT);
-    
-	rkh_fwk_init();
 
-	RKH_FILTER_ON_GROUP(RKH_TRC_ALL_GROUPS);
-	RKH_FILTER_ON_EVENT(RKH_TRC_ALL_EVENTS);
-	RKH_FILTER_OFF_EVENT(RKH_TE_TMR_TOUT);
-	RKH_FILTER_OFF_EVENT(RKH_TE_SM_STATE);
-	RKH_FILTER_OFF_SMA(blinky );
-	RKH_FILTER_OFF_ALL_SIGNALS();
+    rkh_fwk_init();
 
-	RKH_TRC_OPEN();
+    RKH_FILTER_ON_GROUP(RKH_TRC_ALL_GROUPS);
+    RKH_FILTER_ON_EVENT(RKH_TRC_ALL_EVENTS);
+    RKH_FILTER_OFF_EVENT(RKH_TE_TMR_TOUT);
+    RKH_FILTER_OFF_EVENT(RKH_TE_SM_STATE);
+    RKH_FILTER_OFF_SMA(blinky);
+    RKH_FILTER_OFF_ALL_SIGNALS();
 
-	RKH_ENA_INTERRUPT();
+    RKH_TRC_OPEN();
+
+    RKH_ENA_INTERRUPT();
 }
 
-void 
+void
 bsp_ledOn(void)
 {
-	gpioWrite(LED1, ON);
+    gpioWrite(LED1, ON);
 }
 
-
-void 
+void
 bsp_ledOff(void)
 {
-	gpioWrite(LED1, OFF);
+    gpioWrite(LED1, OFF);
 }
 
+/* ------------------------------ End of file ------------------------------ */

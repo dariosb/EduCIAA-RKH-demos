@@ -96,7 +96,7 @@
     #include "../../portable/arm-cortex/rkhs/arm_cm3/codered/rkht.h"
 #endif
 
-#ifdef __DIRECT_PORT__
+#ifdef __EDUCIAA_EID__
     #include "rkht.h"
 #endif
 

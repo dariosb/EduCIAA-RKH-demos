@@ -38,12 +38,11 @@
 
 /* -------------------------- Development history -------------------------- */
 /*
- *  2017.04.14  LeFr  v2.4.05  Initial version
+ *  2017.06.23  DaBa  v1.0.00  Initial version
  */
 
 /* -------------------------------- Authors -------------------------------- */
 /*
- *  LeFr  Leandro Francucci  francuccilea@gmail.com
  *  DaBa  Dario Baliña       dariosb@gmail.com
  */
 
@@ -52,8 +51,6 @@
 #define __BSP_H__
 
 /* ----------------------------- Include files ----------------------------- */
-#include "bsp_common.h"
-
 /* ---------------------- External C language linkage ---------------------- */
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +61,7 @@ extern "C" {
 /* ------------------------------- Data types ------------------------------ */
 /* -------------------------- External variables --------------------------- */
 /* -------------------------- Function prototypes -------------------------- */
+void bsp_init(int argc, char *argv[]);
 void bsp_ledOn(void);
 void bsp_ledOff(void);
 
