@@ -30,47 +30,52 @@
  */
 
 /**
- *  \file       bsp.h
- *  \brief      BSP for 80x86 OS win32 Blinky Demo
+ *  \file       assert.c
+ *  \brief      RKH assert function for EDU-CIAA
  *
  *  \ingroup    bsp
  */
 
 /* -------------------------- Development history -------------------------- */
 /*
- *  2017.06.23  DaBa  v1.0.00  Initial version
+ *  2017.04.14  DaBa  v2.4.05  Initial version
  */
 
 /* -------------------------------- Authors -------------------------------- */
 /*
- *  DaBa  Dario Baliña       dariosb@gmail.com
+ *  DaBa  Dario Baliï¿½a       dariosb@gmail.com
  */
-
-/* --------------------------------- Module -------------------------------- */
-#ifndef __BSP_H__
-#define __BSP_H__
-
+/* --------------------------------- Notes --------------------------------- */
 /* ----------------------------- Include files ----------------------------- */
-/* ---------------------- External C language linkage ---------------------- */
-#ifdef __cplusplus
-extern "C" {
+#include "rkh.h"
+#include "rkhfwk_sched.h"
+#include "sapi.h"
+
+RKH_THIS_MODULE
+
+/* ----------------------------- Local macros ------------------------------ */
+#ifdef DEBUG
+#define reset_now()		__asm volatile	("	bkpt 0x00FF\n" )
+#else
+#define reset_now()		NVIC_SystemReset()
 #endif
 
-/* --------------------------------- Macros -------------------------------- */
-/* -------------------------------- Constants ------------------------------ */
-/* ------------------------------- Data types ------------------------------ */
-/* -------------------------- External variables --------------------------- */
-/* -------------------------- Function prototypes -------------------------- */
-void bsp_init(int argc, char *argv[]);
-void bsp_ledOn(void);
-void bsp_ledOff(void);
+/* ------------------------------- Constants ------------------------------- */
+/* ---------------------------- Local data types --------------------------- */
+/* ---------------------------- Global variables --------------------------- */
+/* ---------------------------- Local variables ---------------------------- */
+/* ----------------------- Local function prototypes ----------------------- */
+/* ---------------------------- Local functions ---------------------------- */
+/* ---------------------------- Global functions --------------------------- */
+void
+rkh_assert(RKHROM char * const file, int line)
+{
+	(void)line;
 
-/* -------------------- External C language linkage end -------------------- */
-#ifdef __cplusplus
+	RKH_DIS_INTERRUPT();
+	RKH_TR_FWK_ASSERT( (RKHROM char *)file, __LINE__ );
+	rkh_fwk_exit();
+	reset_now();
 }
-#endif
-
-/* ------------------------------ Module end ------------------------------- */
-#endif
 
 /* ------------------------------ File footer ------------------------------ */
