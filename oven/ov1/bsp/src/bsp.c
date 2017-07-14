@@ -103,10 +103,6 @@ bsp_init(int argc, char *argv[])
 
     boardConfig();
 
-    gpioConfig(0, GPIO_ENABLE);
-
-    gpioConfig(LED1, GPIO_OUTPUT);
-
     rkh_fwk_init();
 
     RKH_FILTER_ON_GROUP(RKH_TRC_ALL_GROUPS);
@@ -129,8 +125,8 @@ bsp_init(int argc, char *argv[])
 void
 bsp_oven_init(void)
 {
-    init_leds();
-    init_switch();
+    leds_init();
+    switch_init();
 }
 
 void
@@ -164,13 +160,13 @@ bsp_publishSwitchEvt(ruint s, ruint debsw)
 void
 bsp_emitterOn(void)
 {
-    set_rgb_led(RGB_RED);
+    leds_rgbSet(RGB_RED);
 }
 
 void
 bsp_emitterOff(void)
 {
-    set_rgb_led(RGB_BLACK);
+    leds_rgbSet(RGB_BLACK);
 }
 
 /* ------------------------------ End of file ------------------------------ */

@@ -1,30 +1,40 @@
-/*
- * switch.h
+/**
+ *  \file       switch.h
  *
- * Minimal debouncing switch handler
- *
+ *  \brief      Minimal debouncing switch handler.
  */
 
+/* -------------------------- Development history -------------------------- */
+/*
+ *  2015.10.24  DaBa  v1.0.00  Initial version
+ */
+
+/* -------------------------------- Authors -------------------------------- */
+/*
+ *  DaBa  Darío Baliña  dariosb@gmail.com
+ */
+
+/* --------------------------------- Notes --------------------------------- */
 #ifndef __SWITCH_H__
 #define __SWITCH_H__
 
+/* ----------------------------- Include files ----------------------------- */
 #include "rkh.h"
 
-typedef struct
-{
-	unsigned char state;
-	ruint (*rawsw)(void);
-	ruint debsw;
-	ruint filter;
-}SWITCH_ST;
+/* ---------------------- External C language linkage ---------------------- */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+/* --------------------------------- Macros -------------------------------- */
+#define SW_FLT_MSK	(SW_RELEASE|SW_PRESS)
+
+/* -------------------------------- Constants ------------------------------ */
 enum
 {
 	SW_RELEASE = 0x01,
 	SW_PRESS = 0x02
 };
-
-#define SW_FLT_MSK	(SW_RELEASE|SW_PRESS)
 
 enum
 {
@@ -34,8 +44,19 @@ enum
 	SWITCHS_NUM
 };
 
-void init_switch( void );
+/* ------------------------------- Data types ------------------------------ */
+/* -------------------------- External variables --------------------------- */
+/* -------------------------- Function prototypes -------------------------- */
+void switch_init( void );
 void switch_tick( void );
-ruint get_switch_state( ruint who );
+ruint switch_getState( ruint who );
 
+/* -------------------- External C language linkage end -------------------- */
+#ifdef __cplusplus
+}
 #endif
+
+/* ------------------------------ Module end ------------------------------- */
+#endif
+
+/* ------------------------------ End of file ------------------------------ */

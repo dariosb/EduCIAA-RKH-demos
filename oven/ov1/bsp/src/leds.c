@@ -30,7 +30,6 @@ typedef struct
 
 /* ---------------------------- Global variables --------------------------- */
 /* ---------------------------- Local variables ---------------------------- */
-static int32_t fd_leds;
 static const RGB_COLOR_ST rgb_colors[] =
 {
     {0, 0, 0},                                           /* black   */
@@ -47,37 +46,19 @@ static const RGB_COLOR_ST rgb_colors[] =
 /* ---------------------------- Local functions ---------------------------- */
 /* ---------------------------- Global functions --------------------------- */
 void
-init_leds(void)
+leds_init(void)
 {
-//    fd_leds = ciaaPOSIX_open("/dev/dio/out/0", ciaaPOSIX_O_RDWR);
+    gpioConfig(LEDR, GPIO_OUTPUT);
+    gpioConfig(LEDG, GPIO_OUTPUT);
+    gpioConfig(LEDB, GPIO_OUTPUT);
 }
 
 void
-set_led(uint8_t lmask, uint8_t st)
+leds_rgbSet(RGB_COLOR_IDX idx)
 {
-    uint8_t outputs;
-
-    /* set output on */
-//    ciaaPOSIX_read(fd_leds, &outputs, 1);
-
-    if (st)
-    {
-        outputs |= lmask;
-    }
-    else
-    {
-        outputs &= ~lmask;
-    }
-
-//    ciaaPOSIX_write(fd_leds, &outputs, 1);
-}
-
-void
-set_rgb_led(RGB_COLOR_IDX idx)
-{
-    set_led(LED0R_MASK, rgb_colors[idx].r);
-    set_led(LED0G_MASK, rgb_colors[idx].g);
-    set_led(LED0B_MASK, rgb_colors[idx].b);
+    gpioWrite(LEDR, rgb_colors[idx].r);
+    gpioWrite(LEDG, rgb_colors[idx].g);
+    gpioWrite(LEDB, rgb_colors[idx].b);
 }
 
 /* ------------------------------ End of file ------------------------------ */

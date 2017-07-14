@@ -1,26 +1,43 @@
-/*
- * switch.c
+/**
+ *  \file       switch.c
  *
- * Minimal debouncing switch handler.
- * hardware access.
- *
+ *  \brief      Minimal debouncing switch handler.
  */
 
+/* -------------------------- Development history -------------------------- */
+/*
+ *  2015.10.24  DaBa  v1.0.00  Initial version
+ */
+
+/* -------------------------------- Authors -------------------------------- */
+/*
+ *  DaBa  Darío Baliña  dariosb@gmail.com
+ */
+
+/* --------------------------------- Notes --------------------------------- */
+/* ----------------------------- Include files ----------------------------- */
 #include "switch.h"
 #include "sapi.h"
 #include "bsp.h"
 
-#define CIAA_SW1_MSK    1
-#define CIAA_SW2_MSK    2
-#define CIAA_SW3_MSK    4
-#define CIAA_SW4_MSK    8
+/* ----------------------------- Local macros ------------------------------ */
+/* ------------------------------- Constants ------------------------------- */
+/* ---------------------------- Local data types --------------------------- */
+typedef struct
+{
+	unsigned char state;
+	bool_t (*rawsw)(void);
+	ruint debsw;
+	ruint filter;
+}SWITCH_ST;
 
-static int32_t fd_in;
-static uint8_t inputs;
-static ruint rawStart( void );
-static ruint rawStop( void );
-static ruint rawDoor( void );
+/* ---------------------------- Global variables --------------------------- */
+/* ----------------------- Local function prototypes ----------------------- */
+static bool_t rawStart( void );
+static bool_t rawStop( void );
+static bool_t rawDoor( void );
 
+/* ---------------------------- Local variables ---------------------------- */
 static SWITCH_ST switchs[SWITCHS_NUM] = 
 {
 	{ 0, rawStart,	SW_RELEASE, SW_PRESS },
@@ -28,34 +45,35 @@ static SWITCH_ST switchs[SWITCHS_NUM] =
 	{ 0, rawDoor,	SW_RELEASE, SW_PRESS|SW_RELEASE },
 };
 
+/* ---------------------------- Local functions ---------------------------- */
 static
-ruint
+bool_t
 rawStart( void )
 {
-    //ciaaPOSIX_read(fd_in, &inputs, 1);
-	return inputs & CIAA_SW1_MSK;
+    return gpioRead(TEC1);
 }
 
 static
-ruint
+bool_t
 rawStop( void )
 {
-    //ciaaPOSIX_read(fd_in, &inputs, 1);
-	return inputs & CIAA_SW2_MSK;
+    return gpioRead(TEC2);
 }
 	
 static
-ruint
+bool_t
 rawDoor( void )
 {
-    //ciaaPOSIX_read(fd_in, &inputs, 1);
-	return inputs & CIAA_SW3_MSK;
+    return gpioRead(TEC3);
 }
 
+/* ---------------------------- Global functions --------------------------- */
 void
-init_switch( void )
+switch_init( void )
 {
-    //fd_in = ciaaPOSIX_open("/dev/dio/in/0", ciaaPOSIX_O_RDWR);
+    gpioConfig(TEC1, GPIO_INPUT);
+    gpioConfig(TEC2, GPIO_INPUT);
+    gpioConfig(TEC3, GPIO_INPUT);
 }
 
 void
@@ -80,12 +98,12 @@ switch_tick( void )
 				bsp_publishSwitchEvt( s, SW_RELEASE );
 		}
 	}
-
 }
 
-
 ruint
-get_switch_state( ruint who )
+switch_getState( ruint who )
 {
 	return switchs[who].debsw;
 }
+
+/* ------------------------------ End of file ------------------------------ */

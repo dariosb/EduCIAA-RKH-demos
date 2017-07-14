@@ -1,6 +1,3 @@
-/*
- * leds.h
- */
 /**
  *  \file       leds.h
  *
@@ -22,7 +19,7 @@
 #define __LEDS_H__
 
 /* ----------------------------- Include files ----------------------------- */
-#include "sapi.h"  /* <= device handler header */
+#include "sapi.h" 
 
 /* ---------------------- External C language linkage ---------------------- */
 #ifdef __cplusplus
@@ -56,9 +53,8 @@ typedef enum
 /* ------------------------------- Data types ------------------------------ */
 /* -------------------------- External variables --------------------------- */
 /* -------------------------- Function prototypes -------------------------- */
-void init_leds(void);
-void set_led(uint8_t lmask, uint8_t st);
-void set_rgb_led(RGB_COLOR_IDX idx);
+void leds_init(void);
+void leds_rgbSet(RGB_COLOR_IDX idx);
 
 /* -------------------- External C language linkage end -------------------- */
 #ifdef __cplusplus
