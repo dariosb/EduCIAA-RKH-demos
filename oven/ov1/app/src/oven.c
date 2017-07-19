@@ -66,11 +66,10 @@ static RKH_ROM_STATIC_EVENT(e_tout, TMREVT);
 void
 oven_init(Oven *const me)
 {
-    bsp_oven_init();
+    bsp_ovenInit();
 
     /* send objects to trazer */
     RKH_TR_FWK_AO(me);
-    RKH_TR_FWK_QUEUE(&RKH_UPCAST(RKH_SMA_T, me)->equeue);
     RKH_TR_FWK_STATE(me, &idle);
     RKH_TR_FWK_STATE(me, &ready);
     RKH_TR_FWK_STATE(me, &cooking);
