@@ -49,7 +49,7 @@ struct Oven
 
 /* ---------------------------- Global variables --------------------------- */
 /* ============================= Active object ============================= */
-RKH_SMA_CREATE(Oven, oven, 0, FLAT, &idle, oven_init, NULL);
+RKH_SMA_CREATE(Oven, oven, 0, HCAL, &idle, oven_init, NULL);
 RKH_SMA_DEF_PTR(oven);
 
 /* ---------------------------- Local variables ---------------------------- */
